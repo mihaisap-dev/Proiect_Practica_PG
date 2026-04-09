@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, ConfigDict
 
@@ -59,7 +60,14 @@ class QualityCheckRequest(BaseModel):
     characteristic_name: str
     measured_value: float
 
-app = FastAPI(title="Sistem ERP Producție & Calitate")
+app = FastAPI(title="Sistem ERP Productie & Calitate")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()
@@ -94,7 +102,7 @@ def get_characteristics(db: Session = Depends(get_db)):
 
 @app.post("/validate-quality", tags=["Calitate"])
 def validate_quality(data: QualityCheckRequest, db: Session = Depends(get_db), x_username: str = Header(None)):
-    expected_username = os.environ.get("USERNAME")
+    expected_username = os.environ.get("USERNAME", "admin_pg")
 
     if x_username != expected_username:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -105,14 +113,14 @@ def validate_quality(data: QualityCheckRequest, db: Session = Depends(get_db), x
     ).first()
 
     if not spec:
-        raise HTTPException(status_code=404, detail="Specificația nu există în baza de date.")
+        raise HTTPException(status_code=404, detail="Specificatia nu exista in baza de date.")
 
     is_ok = True
     msg = "Produs conform."
 
     if spec.lower_limit is not None and data.measured_value < spec.lower_limit:
         is_ok = False
-        msg = f"Eroare: Valoare prea mică. Minim acceptat: {spec.lower_limit}"
+        msg = f"Eroare: Valoare prea mica. Minim acceptat: {spec.lower_limit}"
     elif spec.upper_limit is not None and data.measured_value > spec.upper_limit:
         is_ok = False
         msg = f"Eroare: Valoare prea mare. Maxim acceptat: {spec.upper_limit}"
