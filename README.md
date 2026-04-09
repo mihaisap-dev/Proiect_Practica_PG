@@ -51,7 +51,7 @@ Deschide interfata apasand pe index.html
 ---
 
 4. **Test Eroare**
-  - ID Produs: `88823141`
-  - Master Name: `abc`
-  - Parametru: `Volum` - **500**
-  - Rezultat așteptat: Eroare: Specificatia nu exista in baza de date
+   - ID Produs: `88823141`
+   - Master Name: `abc`
+   - Parametru: `Volum` - **500**
+   - Rezultat așteptat: Eroare: Specificatia nu exista in baza de date
