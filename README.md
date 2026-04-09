@@ -23,28 +23,35 @@ python3 main.py
 ```
 
 Deschide interfata apasand pe index.html
-Exemple de introdus:
-1. 
-ID Produs: 88823141
-Master Name: CM-10001
-Parametru: Volum - 500
-Rezultat asteptat: CONFORM
 
-2.
-ID Produs: 88823141
-Master Name: CM-10001
-Parametru: Volum - 400
-Rezultat asteptat: Respins (Valoare prea mica)
+### Exemple de testare
 
-3.
-ID Produs: 88823141
-Master Name: CM-10001
-Parametru: Volum - 600
-Rezultat asteptat: Respins (Valoare prea mare)
+1. **Test Conformitate**
+   - ID Produs: `88823141`
+   - Master Name: `CM-10001`
+   - Parametru: `Volum` - **500**
+   - Rezultat așteptat: CONFORM
 
-4.
-2.
-ID Produs: 88823141
-Master Name: abcdef
-Parametru: Volum - 500
-Rezultat asteptat: Specificatia nu exista in baza de date
+---
+
+2. **Test Limita Inferioara**
+   - ID Produs: `88823141`
+   - Master Name: `CM-10001`
+   - Parametru: `Volum` - **400**
+   - Rezultat așteptat: RESPINS (Valoare prea mica)
+
+---
+
+3. **Test Limita Superioara**
+   - ID Produs: `88823141`
+   - Master Name: `CM-10001`
+   - Parametru: `Volum` - **600**
+   - Rezultat așteptat: RESPINS (Valoare prea mare)
+
+---
+
+4. **Test Eroare**
+  - ID Produs: `88823141`
+  - Master Name: `abc`
+  - Parametru: `Volum` - **500**
+  - Rezultat așteptat: Eroare: Specificatia nu exista in baza de date
