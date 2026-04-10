@@ -2,7 +2,7 @@
 
 Acest proiect reprezinta o solutie completa pentru monitorizarea calitatii produselor intr-o linie de productie, folosind **FastAPI**, **PostgreSQL** si un pipeline de **CI/CD (GitHub Actions)**.
 
-## Cum pornesti aplicația local
+## Cum pornesti aplicatia local
 
 ### 1. Pregatirea mediului
 Asigura-te ca ai Python instalat, apoi ruleaza in terminal:
