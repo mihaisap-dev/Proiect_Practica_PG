@@ -55,3 +55,6 @@ Deschide interfata apasand pe index.html
    - Master Name: `abc`
    - Parametru: `Volum` - **500**
    - Rezultat așteptat: Eroare: Specificatia nu exista in baza de date
+
+---
+Pentru interfata FastAPI: http://127.0.0.1:8000/docs
