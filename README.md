@@ -5,7 +5,7 @@ Acest proiect reprezinta o solutie completa pentru monitorizarea calitatii produ
 ## Cum pornesti aplicația local
 
 ### 1. Pregatirea mediului
-Asigura-te că ai Python instalat, apoi ruleaza in terminal:
+Asigura-te ca ai Python instalat, apoi ruleaza in terminal:
 ```bash
 # Creare mediu virtual
 python -m venv venv
@@ -30,7 +30,7 @@ Deschide interfata apasand pe index.html
    - ID Produs: `88823141`
    - Master Name: `CM-10001`
    - Parametru: `Volum` - **500**
-   - Rezultat așteptat: CONFORM
+   - Rezultat asteptat: CONFORM
 
 ---
 
@@ -38,7 +38,7 @@ Deschide interfata apasand pe index.html
    - ID Produs: `88823141`
    - Master Name: `CM-10001`
    - Parametru: `Volum` - **400**
-   - Rezultat așteptat: RESPINS (Valoare prea mica)
+   - Rezultat asteptat: RESPINS (Valoare prea mica)
 
 ---
 
@@ -46,7 +46,7 @@ Deschide interfata apasand pe index.html
    - ID Produs: `88823141`
    - Master Name: `CM-10001`
    - Parametru: `Volum` - **600**
-   - Rezultat așteptat: RESPINS (Valoare prea mare)
+   - Rezultat asteptat: RESPINS (Valoare prea mare)
 
 ---
 
@@ -54,7 +54,7 @@ Deschide interfata apasand pe index.html
    - ID Produs: `88823141`
    - Master Name: `abc`
    - Parametru: `Volum` - **500**
-   - Rezultat așteptat: Eroare: Specificatia nu exista in baza de date
+   - Rezultat asteptat: Eroare: Specificatia nu exista in baza de date
 
 ---
 Pentru interfata FastAPI: http://127.0.0.1:8000/docs
