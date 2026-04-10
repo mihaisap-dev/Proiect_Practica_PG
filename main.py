@@ -100,6 +100,35 @@ def get_relationships(db: Session = Depends(get_db)):
 def get_characteristics(db: Session = Depends(get_db)):
     return db.query(Characteristics).all()
 
+@app.post("/identifiers", response_model=IdentifierSchema, tags=["Productie"])
+def create_identifier(data: IdentifierSchema, db: Session = Depends(get_db), x_username: str = Header(None)):
+    # Verificare securitate (opțional, dar recomandat)
+    if x_username != os.environ.get("USERNAME", "admin_pg"):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    new_prod = Identifiers(
+        identifier_name=data.identifier_name,
+        description=data.description,
+        identifier_type=data.identifier_type
+    )
+    db.add(new_prod)
+    db.commit()
+    db.refresh(new_prod)
+    return new_prod
+
+@app.delete("/identifiers/{name}", tags=["Productie"])
+def delete_identifier(name: str, db: Session = Depends(get_db), x_username: str = Header(None)):
+    if x_username != os.environ.get("USERNAME", "admin_pg"):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    prod = db.query(Identifiers).filter(Identifiers.identifier_name == name).first()
+    if not prod:
+        raise HTTPException(status_code=404, detail="Produsul nu a fost găsit.")
+    
+    db.delete(prod)
+    db.commit()
+    return {"message": f"Produsul {name} a fost șters cu succes."}
+
 @app.post("/validate-quality", tags=["Calitate"])
 def validate_quality(data: QualityCheckRequest, db: Session = Depends(get_db), x_username: str = Header(None)):
     expected_username = os.environ.get("USERNAME", "admin_pg")

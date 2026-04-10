@@ -2,36 +2,64 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>P&G Quality Control</title>
+    <title>P&G ERP - Management si Calitate</title>
     <style>
-        body { font-family: sans-serif; margin: 40px; background: #f4f4f4; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 400px; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        body { font-family: sans-serif; margin: 40px; background: #f4f4f4; color: #333; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 550px; }
+        h2, h3 { color: #003da5; margin-top: 0; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { background: #003da5; color: white; border: none; cursor: pointer; font-weight: bold; }
-        #rezultat { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; }
+        button:hover { background: #002a70; }
+        .btn-delete { background: #dc3545; padding: 5px 10px; width: auto; font-size: 11px; }
+        .btn-refresh { background: #28a745; margin-bottom: 15px; }
+        #rezultat { margin-top: 15px; padding: 15px; border-radius: 4px; display: none; }
         .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f9fa; color: #003da5; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Control Calitate</h2>
-        <input type="text" id="prodId" placeholder="ID Produs (ex: 88823141)">
-        <input type="text" id="masterName" placeholder="Master Name (ex: CM-10001)">
-        <select id="charName">
-            <option value="Volume">Volum</option>
-            <option value="pH">pH</option>
-            <option value="Viscosity">Viscozitate</option>
-        </select>
-        <input type="number" id="valoare" placeholder="Valoare masurata">
-        
-        <button onclick="valideaza()">Verifica Produsul</button>
+    <h1 style="text-align: center; color: #003da5;">P&G Sistem Productie</h1>
 
-        <div id="rezultat"></div>
+    <div class="container">
+        <div class="card">
+            <h2>Control Calitate</h2>
+            <input type="text" id="prodId" placeholder="Nume Produs (ex: Shampon)">
+            <input type="text" id="masterName" placeholder="Master Name (ex: CM-10001)">
+            <select id="charName">
+                <option value="Volume">Volum</option>
+                <option value="pH">pH</option>
+                <option value="Viscosity">Viscozitate</option>
+            </select>
+            <input type="number" id="valoare" placeholder="Valoare masurata">
+            
+            <button onclick="valideaza()">Verifica Calitatea</button>
+            <div id="rezultat"></div>
+        </div>
+
+        <div class="card">
+            <h2>Management Produse</h2>
+            <input type="text" id="newProdName" placeholder="Nume (ex: Pampers)">
+            <input type="text" id="newProdDesc" placeholder="Descriere (ex: Scutece marimea 4)">
+            <input type="text" id="newProdType" placeholder="Categorie (ex: Baby Care)">
+            <button style="background: #28a745;" onclick="adaugaProdus()">Adauga Produs Nou</button>
+            
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <h3>Lista Produse Active</h3>
+            <button class="btn-refresh" onclick="incarcaProduse()">Refresh Lista</button>
+            <div id="listaProduse"></div>
+        </div>
     </div>
 
     <script>
+        const API_BASE = "http://127.0.0.1:8000";
+        const AUTH_HEADER = { 'x-username': 'admin_pg', 'Content-Type': 'application/json' };
+
         async function valideaza() {
             const resDiv = document.getElementById('rezultat');
             const data = {
@@ -42,12 +70,9 @@
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/validate-quality', {
+                const response = await fetch(`${API_BASE}/validate-quality`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-username': 'admin_pg' 
-                    },
+                    headers: AUTH_HEADER,
                     body: JSON.stringify(data)
                 });
 
@@ -56,15 +81,80 @@
                 
                 if (response.status === 200) {
                     resDiv.className = result.decizie === 'ACCEPTAT' ? 'success' : 'error';
-                    resDiv.innerHTML = `<strong>${result.decizie}</strong>: ${result.detalii}`;
+                    resDiv.innerHTML = `Verdict: ${result.decizie}<br>${result.detalii}`;
                 } else {
                     resDiv.className = 'error';
-                    resDiv.innerText = "Eroare: " + (result.detail || "Verifica datele");
+                    resDiv.innerText = "Eroare: " + (result.detail || "Date invalide");
                 }
             } catch (err) {
-                alert("Asigura-te ca API-ul (main.py) este pornit!");
+                alert("API-ul nu raspunde.");
             }
         }
+
+        async function adaugaProdus() {
+            const name = document.getElementById('newProdName').value;
+            const desc = document.getElementById('newProdDesc').value;
+            const type = document.getElementById('newProdType').value;
+
+            if(!name) { alert("Numele este obligatoriu!"); return; }
+
+            const data = { identifier_name: name, description: desc, identifier_type: type };
+
+            try {
+                const response = await fetch(`${API_BASE}/identifiers`, {
+                    method: 'POST',
+                    headers: AUTH_HEADER,
+                    body: JSON.stringify(data)
+                });
+
+                if(response.ok) {
+                    alert("Produs adaugat!");
+                    document.getElementById('newProdName').value = '';
+                    document.getElementById('newProdDesc').value = '';
+                    document.getElementById('newProdType').value = '';
+                    incarcaProduse();
+                }
+            } catch (err) { alert("Eroare conexiune."); }
+        }
+
+        // Incarcare tabel cu Nume, Descriere si Tip
+        async function incarcaProduse() {
+            try {
+                const response = await fetch(`${API_BASE}/identifiers`);
+                const produse = await response.json();
+                
+                let html = '<table><tr><th>Nume</th><th>Descriere</th><th>Tip</th><th>Actiune</th></tr>';
+                produse.forEach(p => {
+                    html += `<tr>
+                        <td><strong>${p.identifier_name}</strong></td>
+                        <td>${p.description || '-'}</td>
+                        <td>${p.identifier_type || '-'}</td>
+                        <td><button class="btn-delete" onclick="stergeProdus('${p.identifier_name}')">Sterge</button></td>
+                    </tr>`;
+                });
+                html += '</table>';
+                document.getElementById('listaProduse').innerHTML = html;
+            } catch (err) {
+                document.getElementById('listaProduse').innerHTML = "<p style='color:red;'>Eroare la incarcarea datelor.</p>";
+            }
+        }
+
+        // Stergere produs
+        async function stergeProdus(name) {
+            if(!confirm(`Sigur doresti sa stergi produsul "${name}"?`)) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/identifiers/${name}`, {
+                    method: 'DELETE',
+                    headers: { 'x-username': 'admin_pg' }
+                });
+                if(response.ok) {
+                    incarcaProduse();
+                }
+            } catch (err) { alert("Eroare conexiune."); }
+        }
+
+        window.onload = incarcaProduse;
     </script>
 </body>
 </html>
